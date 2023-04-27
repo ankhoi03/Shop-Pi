@@ -2,22 +2,22 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
-const Item = () => {
+const Item = (props) => {
     const navigation = useNavigation();
-
+    const { data,onAdd } = props;
     const gotoDetail = () => {
-        navigation.navigate('ProductDetail');
+        navigation.navigate('ProductDetail',{id:data?._id});
     };
     return (
         <TouchableOpacity style={styles.container} onPress={gotoDetail}>
-            <Image style={styles.img} source={require('../images/sony.jpg')}></Image>
-            <Text style={styles.text}>Sony Xperia 1 IV</Text>
+            <Image style={styles.img} source={{ uri: data?.image }}></Image>
+            <Text numberOfLines={1} style={styles.text}>{data?.name}</Text>
             <Image source={require('../images/Group391.png')}></Image>
-            <Text style={styles.cost}>$1299,99</Text>
+            <Text style={styles.cost}>${data?.price}</Text>
             <View style={styles.bottomView}>
                 <Text style={styles.oldCost}>$1599,99</Text>
                 <Text style={styles.sale}>24% off</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onAdd}>
                     <Image style={styles.imgAdd} source={require('../images/add.png')}></Image>
                 </TouchableOpacity>
 

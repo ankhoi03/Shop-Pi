@@ -1,10 +1,42 @@
-import { StyleSheet, Text, View, StatusBar, Image, TouchableOpacity, Dimensions, ScrollView } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, StatusBar, Image, TouchableOpacity, Dimensions, ScrollView, ToastAndroid } from 'react-native'
+import React,{useState,useEffect} from 'react'
+import AxiosIntance from '../config/AxiosIntance'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ProductDetail = (props) => {
+    const { route } = props;
+    const { params } = route;
     const { navigation } = props;
     const goBack = () => {
         navigation.goBack();
+    }
+    const [productDetail, setproductDetail] = useState([]);
+    useEffect(() => {
+        const getProduct = async () => {
+            const res = await AxiosIntance().get('product/'+params.id);
+            console.log(res);
+            if (res) {
+                setproductDetail(res.product);
+            }
+        }
+        getProduct();
+        return () => {
+
+        }
+    }, [])
+    const addCart =async () => {
+        const userId = await AsyncStorage.getItem('userId');
+        const newCart = {
+          userId,
+          "productId":productDetail._id,
+          "quantity": 1
+        }
+        const res=await AxiosIntance().post('user/addtocart',newCart);
+        if(res.result.success==true){
+          ToastAndroid.show("Thêm vào giỏ hàng thành công!!", ToastAndroid.SHORT);
+        } else{
+          ToastAndroid.show("Thêm vào giỏ hàng thất bại!!", ToastAndroid.SHORT);
+        }
     }
     return (
         <View style={styles.container}>
@@ -27,9 +59,9 @@ const ProductDetail = (props) => {
 
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <Image style={styles.banner} source={require('../images/sony.jpg')} />
-                <Text style={styles.text}>Sony Xperia 1 IV</Text>
-                <Text style={styles.cost}>$1299,99</Text>
+                <Image style={styles.banner} source={{ uri: productDetail?.image }} />
+                <Text style={styles.text}>{productDetail?.name}</Text>
+                <Text style={styles.cost}>${productDetail?.price}</Text>
                 <View style={styles.discount}>
                     <Text style={styles.oldCost}>$1599,99</Text>
                     <Text style={styles.sale}>24% off</Text>
@@ -39,45 +71,37 @@ const ProductDetail = (props) => {
                 <View style={styles.infoView}>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>Screen:</Text>
-                        <Text style={styles.infoText}>OLED 4K 120Hz, 6.5", 21:9</Text>
+                        <Text style={styles.infoText}>{productDetail?.display}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>Operating system:</Text>
-                        <Text style={styles.infoText}>Android 12</Text>
+                        <Text style={styles.infoText}>{productDetail?.system}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
-                        <Text style={styles.titleText}>Rear Camera:</Text>
-                        <Text style={styles.infoText}>Main 12MP & Sub 2x12MP</Text>
-                    </View>
-                    <View style={styles.rowCenterView}>
-                        <Text style={styles.titleText}>Front Camera</Text>
-                        <Text style={styles.infoText}>12MP</Text>
+                        <Text style={styles.titleText}> Camera:</Text>
+                        <Text style={styles.infoText}>{productDetail?.camera}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>Chip:</Text>
-                        <Text style={styles.infoText}>Snapdragon 8 Gen 1</Text>
+                        <Text style={styles.infoText}>{productDetail?.chip}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>RAM:</Text>
-                        <Text style={styles.infoText}>12GB</Text>
+                        <Text style={styles.infoText}>{productDetail?.ram}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>Storage capacity:</Text>
-                        <Text style={styles.infoText}>512GB</Text>
-                    </View>
-                    <View style={styles.rowCenterView}>
-                        <Text style={styles.titleText}>SIM:</Text>
-                        <Text style={styles.infoText}>1 Nano SIM & 1 eSIM, 5G Support</Text>
+                        <Text style={styles.infoText}>{productDetail?.rom}</Text>
                     </View>
                     <View style={styles.rowCenterView}>
                         <Text style={styles.titleText}>Rechargeable batteries:</Text>
-                        <Text style={styles.infoText}>5000mAh, 30w</Text>
+                        <Text style={styles.infoText}>{productDetail?.battery}</Text>
                     </View>
             
                   
                 </View>
 
-                <TouchableOpacity style={styles.btn} >
+                <TouchableOpacity style={styles.btn} onPress={addCart}>
                     <Text style={styles.btnText}>Add to Cart</Text>
                 </TouchableOpacity>
 
@@ -104,7 +128,7 @@ const styles = StyleSheet.create({
     },
     infoView: {
         marginTop: 20,
-        height: 310,
+        height: 250,
         backgroundColor: '#F7F7F9',
         paddingStart: 16,
         paddingTop: 10,

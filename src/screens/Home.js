@@ -1,15 +1,52 @@
-import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, FlatList, TextInput } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, FlatList, TextInput, ToastAndroid } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import Item from '../component/Item'
+import AxiosIntance from '../config/AxiosIntance'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Home = (props) => {
   const { navigation } = props;
   const goToCart = () => {
-      navigation.navigate('Cart');
+    navigation.navigate('Cart');
   }
   const goToProfile = () => {
     navigation.navigate('Profile');
-}
+  }
+  const goToSearch = () => {
+    navigation.navigate('Search');
+  }
+  const [data, setdata] = useState([]);
+  const [isLoading, setisLoading] = useState(true);
+  useEffect(() => {
+    const getAllproduct = async () => {
+      const res = await AxiosIntance().get('product/allproducts');
+
+      if (res) {
+        setdata(res.products);
+        setisLoading(false);
+      }
+    }
+    getAllproduct();
+    return () => {
+
+    }
+  }, [])
+
+  
+  const addCart =async (productId) => {
+    const userId = await AsyncStorage.getItem('userId');
+    const newCart = {
+      userId,
+      "productId":productId,
+      "quantity": 1
+    }
+    const res=await AxiosIntance().post('user/addtocart',newCart);
+    if(res.result.success==true){
+      ToastAndroid.show("Thêm vào giỏ hàng thành công!!", ToastAndroid.SHORT);
+    } else{
+      ToastAndroid.show("Thêm vào giỏ hàng thất bại!!", ToastAndroid.SHORT);
+    }
+  };
   return (
     <View style={styles.container}>
       <StatusBar
@@ -17,12 +54,12 @@ const Home = (props) => {
         translucent={true}
         backgroundColor={'transparent'}
       ></StatusBar>
-
+      
       <View style={styles.headerView}>
         <TouchableOpacity onPress={goToProfile}>
           <Image source={require('../images/more.png')}></Image>
         </TouchableOpacity>
-        <Text style={styles.titleText}>Explore</Text>
+        <Text style={styles.titleText}>Shop Pi</Text>
         <TouchableOpacity onPress={goToCart}>
           <Image source={require('../images/cart.png')}></Image>
         </TouchableOpacity>
@@ -30,15 +67,16 @@ const Home = (props) => {
 
       <View style={styles.searchView}>
         <Image source={require('../images/search.png')}></Image>
-        <TextInput style={styles.searchText} placeholder='Looking for product'></TextInput>
+        <TextInput style={styles.searchText} placeholder='Looking for product' onPressIn={goToSearch}></TextInput>
       </View>
       <Text style={styles.allProductText}>All Products</Text>
+      
       <View style={styles.listView}>
 
         <FlatList
-          data={dataLord}
+          data={data}
           numColumns={2}
-          renderItem={({ item }) => <Item />}
+          renderItem={({ item }) => <Item data={item}  onAdd={() => addCart(item._id)}/>}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
         />
@@ -67,7 +105,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: 'Raleway',
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: '#2B2B2B'
   },
@@ -99,8 +137,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: '#2B2B2B',
-    marginTop:10,
-    marginStart:5
+    marginTop: 10,
+    marginStart: 5
   },
 
 })

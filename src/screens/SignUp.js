@@ -1,10 +1,30 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity,StatusBar } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity,StatusBar, ToastAndroid } from 'react-native'
+import React,{useState} from 'react'
+import config from '../config/Config'
+import AxiosIntance from '../config/AxiosIntance'
 
 const SignUp = (props) => {
   const { navigation } = props;
-  const goSignIn = () => {
-      navigation.navigate('SignIn');
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
+  const [name, setname] = useState('');
+  const [confirm_password, setconfirm_password] = useState('');
+  const [hiddenPassword, sethiddenPassword] = useState(true);
+  const goSignIn = async() => {
+    let data = { email, password,name,confirm_password }
+
+   
+    const res = await AxiosIntance().post('user/register', data);
+    console.log(res);
+    if(res.result==true){
+      ToastAndroid.show("Đăng ký thành công!!", ToastAndroid.SHORT);
+      setTimeout(function(){
+        navigation.navigate('SignIn');
+      },2000);
+    } else {
+      ToastAndroid.show("Đăng ký thất bại!!", ToastAndroid.SHORT);
+    }
+    
   }
   return (
     <View style={styles.container}>
@@ -18,26 +38,44 @@ const SignUp = (props) => {
       <Text style={styles.createText}>Create an new account</Text>
       <View style={styles.inputView}>
         <Image source={require('../images/User.png')}></Image>
-        <TextInput placeholder='Full Name' />
+        <TextInput placeholder='Full Name' onChangeText={setname}/>
       </View>
       <View style={styles.inputView}>
         <Image source={require('../images/Message.png')}></Image>
-        <TextInput placeholder='Email' />
+        <TextInput placeholder='Email' onChangeText={setemail}/>
       </View>
       <View style={styles.inputView}>
-        <Image source={require('../images/Password.png')}></Image>
-        <TextInput placeholder='Password' />
+      {
+          hiddenPassword ?
+            <TouchableOpacity onPress={() => sethiddenPassword(false)}>
+              <Image source={require('../images/Password.png')}></Image>
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={() => sethiddenPassword(true)}>
+              <Image source={require('../images/Password2.png')}></Image>
+            </TouchableOpacity>
+        }
+        <TextInput secureTextEntry={hiddenPassword} placeholder='Password' onChangeText={setpassword}/>
       </View>
       <View style={styles.inputView}>
-        <Image source={require('../images/Password.png')}></Image>
-        <TextInput placeholder='Password Again' />
+      {
+          hiddenPassword ?
+            <TouchableOpacity onPress={() => sethiddenPassword(false)}>
+              <Image source={require('../images/Password.png')}></Image>
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={() => sethiddenPassword(true)}>
+              <Image source={require('../images/Password2.png')}></Image>
+            </TouchableOpacity>
+        }
+        <TextInput secureTextEntry={hiddenPassword} placeholder='Password Again' onChangeText={setconfirm_password}/>
       </View>
-      <TouchableOpacity style={styles.btn} >
+      <TouchableOpacity style={styles.btn} onPress={goSignIn}>
         <Text style={styles.btnText}>Sign Up</Text>
       </TouchableOpacity>
       <View style={styles.havView}>
         <Text>have a account?</Text>
-        <Text style={styles.signIntext} onPress={goSignIn}>Sign In</Text>
+        <Text style={styles.signIntext} onPress={()=>navigation.navigate('SignIn')}>Sign In</Text>
       </View>
     </View>
   )
@@ -108,3 +146,6 @@ const styles = StyleSheet.create({
     marginStart:10
   }
 })
+
+
+

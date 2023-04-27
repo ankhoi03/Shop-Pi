@@ -2,32 +2,34 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
-const CartItem = () => {
+const CartItem = (props) => {
+    const { data,onDelete,onIncrement,onDecrement } = props;
+
 
     return (
         <View style={styles.container} >
-            <Image style={styles.img} source={require('../images/sony.jpg')} />
+            <Image style={styles.img} source={{ uri: data?.productId.image }}/>
 
             <View style={styles.rightView}>
                 <View style={styles.rowCenterView}>
-                    <Text style={styles.text}>Sony Xperia 1 IV</Text>
-                    <TouchableOpacity>
+                    <Text style={styles.text}>{data?.productId.name}</Text>
+                    <TouchableOpacity  onPress={onDelete}>
                         <Image source={require('../images/del.png')} />
                     </TouchableOpacity>
                 </View>
                 <View style={[styles.rowCenterView, { marginTop: 20 }]}>
-                    <Text style={styles.cost}>$1299,99</Text>
+                    <Text style={styles.cost}>${data?.productId.price}</Text>
                     <View style={styles.btnView}>
                         <View style={styles.btn}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={onDecrement}>
                                 <Image source={require('../images/Minus.png')} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.quatityView}>
-                            <Text style={styles.quatityText}>1</Text>
+                            <Text style={styles.quatityText}>{data?.quantity}</Text>
                         </View>
                         <View style={styles.btn}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={onIncrement}>
                                 <Image source={require('../images/Plus.png')} />
                             </TouchableOpacity>
                         </View>

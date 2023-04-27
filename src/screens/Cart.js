@@ -1,12 +1,80 @@
-import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, FlatList } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image, FlatList, ToastAndroid } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import CartItem from '../component/CartItem'
+import AxiosIntance from '../config/AxiosIntance'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Cart = (props) => {
     const { navigation } = props;
     const goBack = () => {
         navigation.goBack();
     }
+    const [data, setdata] = useState([]);
+    const [totalPrice, settotalPrice] = useState(0);
+    const handletotalPrice=(cart)=>{
+        let total = 0;
+        cart.forEach((cartItem) => {
+          total += cartItem.quantity * cartItem.productId.price;
+        });
+        settotalPrice(total);
+    }
+    useEffect(() => {
+        const getCart = async () => {
+            const userId = await AsyncStorage.getItem('userId');
+            const res = await AxiosIntance().get('user/getcart/'+userId);
+
+            if (res) {
+                setdata(res.cart);
+                handletotalPrice(res.cart)
+            }
+        }
+        getCart();
+
+        return () => {
+
+        }
+    }, [])
+
+    const handleDelete = async (id) => {
+        const res = await AxiosIntance().get('user/cart/delete/' + id);
+        if (res.status == true) {
+            ToastAndroid.show("Xóa khỏi giỏ hàng thành công!!", ToastAndroid.SHORT);
+            const newData = data.filter((dataL) => dataL._id !== id);
+            setdata(newData);
+            handletotalPrice(newData);
+        } else {
+            ToastAndroid.show("Thêm vào giỏ hàng thất bại!!", ToastAndroid.SHORT);
+        }
+
+    };
+    const handleIncrement = async (id) => {
+        const res = await AxiosIntance().post('user/incrementcart', { id });
+        if (res.result == true) {
+            const newData = data.map((dataL) => {
+                if (dataL._id == id) {
+                    return { ...dataL, quantity: dataL.quantity + 1 };
+                }
+                return dataL;
+            });
+            setdata(newData);
+            handletotalPrice(newData);
+        }
+    };
+
+    const handleDecrement =async (id) => {
+        const res = await AxiosIntance().post('user/decrementcart', { id });
+        if (res.result == true) {
+            const newData = data.map((dataL) => {
+                if (dataL._id == id && dataL.quantity > 1) {
+                    return { ...dataL, quantity: dataL.quantity - 1 };
+                }
+                return dataL;
+            });
+            setdata(newData);
+            handletotalPrice(newData);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar
@@ -27,8 +95,8 @@ const Cart = (props) => {
 
             <View style={styles.listView}>
                 <FlatList
-                    data={dataLord}
-                    renderItem={({ item }) => <CartItem />}
+                    data={data}
+                    renderItem={({ item }) => <CartItem data={item} onDelete={() => handleDelete(item._id)} onIncrement={() => handleIncrement(item._id)} onDecrement={() => handleDecrement(item._id)} />}
                     keyExtractor={(item) => item._id}
                     showsVerticalScrollIndicator={false}
                 />
@@ -36,17 +104,17 @@ const Cart = (props) => {
 
             <View style={styles.priceView}>
                 <View style={styles.rowCenterView}>
-                    <Text style={styles.normalText}>Items (4)</Text>
-                    <Text style={styles.normalPrice}>$5199,96</Text>
+                    <Text style={styles.normalText}>Items</Text>
+                    <Text style={styles.normalPrice}>${totalPrice.toFixed(2)}</Text>
                 </View>
                 <View style={styles.rowCenterView}>
                     <Text style={styles.normalText}>Shipping</Text>
-                    <Text style={styles.normalPrice}>$1,99</Text>
+                    <Text style={styles.normalPrice}>$5</Text>
                 </View>
                 <Image source={require('../images/Line.png')}></Image>
                 <View style={styles.rowCenterView}>
                     <Text style={styles.totalPriceText}>Total Price</Text>
-                    <Text style={styles.totalPrice}>$5198,98</Text>
+                    <Text style={styles.totalPrice}>${(totalPrice+5).toFixed(2)}</Text>
                 </View>
             </View>
 

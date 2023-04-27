@@ -28,6 +28,7 @@ import CartItem from './src/component/CartItem';
 import Cart from './src/screens/Cart';
 import ProductDetail from './src/screens/ProductDetail';
 import Profile from './src/screens/Profile';
+import Search from './src/screens/Search';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -46,8 +47,10 @@ const App = () => {
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="ProductDetail" component={ProductDetail} />
       <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="Search" component={Search} />
     </Stack.Navigator>
   </NavigationContainer>
+  
  
    
   );
