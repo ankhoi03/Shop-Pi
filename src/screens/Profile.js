@@ -15,11 +15,11 @@ const Profile = (props) => {
             ></StatusBar>
 
             <View style={styles.headerView}>
-                <TouchableOpacity onPress={goBack}>
+                <TouchableOpacity onPress={goBack} style={styles.headerButton}>
                     <Image source={require('../images/back.png')}></Image>
                 </TouchableOpacity>
                 <Text style={styles.titleScreen}>Profile</Text>
-                <TouchableOpacity>
+                <TouchableOpacity style={styles.headerButton}>
                     <Image source={require('../images/More2.png')}></Image>
                 </TouchableOpacity>
             </View >
@@ -107,6 +107,12 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '700',
         color: '#2B2B2B'
+    },
+    headerButton:{
+        width:26,
+        height:26,
+        justifyContent:'center',
+        alignItems:'center'
     },
     img: {
         width: Dimensions.get('window').width - 40,

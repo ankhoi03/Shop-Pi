@@ -84,11 +84,11 @@ const Cart = (props) => {
             ></StatusBar>
 
             <View style={styles.headerView}>
-                <TouchableOpacity onPress={goBack}>
+                <TouchableOpacity onPress={goBack} style={styles.headerButton}>
                     <Image source={require('../images/back.png')}></Image>
                 </TouchableOpacity>
                 <Text style={styles.titleText}>Your cart</Text>
-                <TouchableOpacity>
+                <TouchableOpacity style={styles.headerButton}>
                     <Image source={require('../images/More2.png')}></Image>
                 </TouchableOpacity>
             </View >
@@ -139,6 +139,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
+    },
+    headerButton:{
+        width:26,
+        height:26,
+        justifyContent:'center',
+        alignItems:'center'
     },
     titleText: {
         fontFamily: 'Raleway',

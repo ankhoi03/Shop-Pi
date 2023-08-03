@@ -11,11 +11,9 @@ const SignUp = (props) => {
   const [confirm_password, setconfirm_password] = useState('');
   const [hiddenPassword, sethiddenPassword] = useState(true);
   const goSignIn = async() => {
-    let data = { email, password,name,confirm_password }
-
    
+    let data = { email, password,name,confirm_password }
     const res = await AxiosIntance().post('user/register', data);
-    console.log(res);
     if(res.result==true){
       ToastAndroid.show("Đăng ký thành công!!", ToastAndroid.SHORT);
       setTimeout(function(){
@@ -24,7 +22,8 @@ const SignUp = (props) => {
     } else {
       ToastAndroid.show("Đăng ký thất bại!!", ToastAndroid.SHORT);
     }
-    
+
+  
   }
   return (
     <View style={styles.container}>

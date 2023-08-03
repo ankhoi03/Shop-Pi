@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
@@ -17,10 +17,6 @@ const Item = (props) => {
             <View style={styles.bottomView}>
                 <Text style={styles.oldCost}>$1599,99</Text>
                 <Text style={styles.sale}>24% off</Text>
-                <TouchableOpacity onPress={onAdd}>
-                    <Image style={styles.imgAdd} source={require('../images/add.png')}></Image>
-                </TouchableOpacity>
-
             </View>
         </TouchableOpacity>
     )
@@ -28,10 +24,11 @@ const Item = (props) => {
 
 export default Item
 
+
 const styles = StyleSheet.create({
     container: {
-        width: 165,
-        height: 280,
+        width: Dimensions.get('window').width * 0.42,
+        aspectRatio:1/1.6,
         backgroundColor: '#FFFFFF',
         elevation: 3,
         borderWidth: 1,
@@ -43,8 +40,9 @@ const styles = StyleSheet.create({
     },
     img: {
         alignSelf: 'center',
-        width: 150,
-        height: 150
+        width: Dimensions.get('window').width * 0.35,
+        aspectRatio:1,
+        resizeMode:'cover'
     },
     text: {
         color: '#223263',
@@ -78,7 +76,8 @@ const styles = StyleSheet.create({
         marginEnd: 2
     },
     imgAdd: {
-        bottom: 1,
-        right: 0
+        bottom: 0,
+        right: 0,
+        position:'absolute'
     }
 })
