@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     banner: {
         width: Dimensions.get('window').width - 60,
-        height: 360,
+        aspectRatio:1,
         alignSelf: 'center',
         marginTop: 20
     },
